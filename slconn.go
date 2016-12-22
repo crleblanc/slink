@@ -42,12 +42,14 @@ func (s *SLCD) SetSLAddr(sladdr string) {
 	(((*_Ctype_SLCD)(s)).sladdr) = C.CString(sladdr)
 }
 func (s *SLCD) Collect() (*SLPacket, int) {
-	slpack := new(C.struct_slpacket_s)
+	// use C's malloc() instead of Go's new() to allocate memory and avoid Go garbage
+	// collecting the memory while C is accessing it.  Use SLPacket's Free() to free memory.
+	slpack := (*C.struct_slpacket_s)(C.malloc((C.sizeof_struct_slpacket_s)))
 	err := (int)(C.sl_collect((*C.struct_slcd_s)(s), &slpack))
 	return (*SLPacket)(slpack), err
 }
 func (s *SLCD) CollectNB() (*SLPacket, int) {
-	slpack := new(C.struct_slpacket_s)
+	slpack := (*C.struct_slpacket_s)(C.malloc((C.sizeof_struct_slpacket_s)))
 	err := (int)(C.sl_collect_nb((*C.struct_slcd_s)(s), &slpack))
 	return (*SLPacket)(slpack), err
 }

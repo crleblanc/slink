@@ -59,3 +59,7 @@ func (p *SLPacket) ParseRecord(blktflag, unpackflag int8) *SLMSRecord {
 	C.sl_msr_parse((*C.struct_SLlog_s)(nil), (*_Ctype_char)(unsafe.Pointer(&p.msrecord[0])), &msr, (C.int8_t)(blktflag), (C.int8_t)(unpackflag))
 	return (*SLMSRecord)(msr)
 }
+
+func (p *SLPacket) Free() {
+	C.free(unsafe.Pointer(p))
+}
